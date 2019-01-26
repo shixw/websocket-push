@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Set;
 
 /**
  * @Description: session 信息服务
@@ -19,12 +20,27 @@ public class WebSocketSessionServiceImpl implements WebSocketSessionService {
     private RedisTemplate<String,String> redisTemplate;
 
     @Override
-    public void register(String key, String ip, int port) {
-        redisTemplate.opsForSet().add(WEB_SOCKET_SESSION_CACHE_KEY_PREFIX+key,ip+":"+port);
+    public void register(String routeKey, String ip, int port) {
+        redisTemplate.opsForSet().add(getCacheKey(routeKey),ip+":"+port);
     }
 
     @Override
-    public void unRegister(String key, String ip, int port) {
-        redisTemplate.opsForSet().remove(WEB_SOCKET_SESSION_CACHE_KEY_PREFIX+key,ip+":"+port);
+    public void unRegister(String routeKey, String ip, int port) {
+        redisTemplate.opsForSet().remove(getCacheKey(routeKey),ip+":"+port);
+    }
+
+    @Override
+    public Set<String> listRegisterAddress(String routeKey) {
+        return redisTemplate.opsForSet().members(getCacheKey(routeKey));
+    }
+
+
+    /**
+     * 获取缓存key
+     * @param routeKey
+     * @return
+     */
+    private String getCacheKey(String routeKey){
+        return WEB_SOCKET_SESSION_CACHE_KEY_PREFIX+routeKey;
     }
 }

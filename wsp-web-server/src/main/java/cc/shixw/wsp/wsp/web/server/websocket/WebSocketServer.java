@@ -1,6 +1,7 @@
 package cc.shixw.wsp.wsp.web.server.websocket;
 
 import cc.shixw.wsp.wsp.web.server.entity.WSPMessage;
+import cc.shixw.wsp.wsp.web.server.exception.NoRegisterClientException;
 import cc.shixw.wsp.wsp.web.server.service.WebSocketSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +98,7 @@ public class WebSocketServer {
 
 
     public void sendMessage(WSPMessage wspMessage) throws Exception{
-        this.session.getBasicRemote().sendObject(wspMessage.getMessage());
+        this.session.getBasicRemote().sendText(wspMessage.getMessage());
     }
 
 
@@ -105,19 +106,15 @@ public class WebSocketServer {
      * 按照route在当前节点的连接缓存中推送消息
      * @param wspMessage
      */
-    public static void sendInfoByRoute(final WSPMessage wspMessage){
+    public static void sendInfoByRoute(final WSPMessage wspMessage) throws Exception {
         String key = wspMessage.getUuid()+wspMessage.getRoute();
         if (websocketMap.containsKey(key)){
             Set<WebSocketServer> servers = websocketMap.get(key);
-            servers.forEach(server-> {
-                try {
-                    server.sendMessage(wspMessage);
-                } catch (Exception e) {
-                    LOGGER.error("向UUID:"+wspMessage.getUuid()+",route:"+wspMessage.getRoute()+"发送消息异常");
-                }
-            });
+            for (WebSocketServer server : servers) {
+                server.sendMessage(wspMessage);
+            }
         }else{
-            LOGGER.error("未找到当前连接的客户端");
+            throw new NoRegisterClientException("未找到注册的客户端连接");
         }
     }
 

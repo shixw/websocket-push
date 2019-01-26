@@ -7,7 +7,7 @@ import java.io.Serializable;
  * @Auther: Ⅱ又贝人韦
  * @Date: 2019/1/25 23:30
  */
-public class WSPMessage<T extends Serializable> implements Serializable{
+public class WSPMessage implements Serializable{
 
     /**
      * UUID
@@ -22,9 +22,12 @@ public class WSPMessage<T extends Serializable> implements Serializable{
     /**
      * 消息体
      */
-    private T message;
+    private String message;
 
-    public WSPMessage(String uuid, String route, T message) {
+    public WSPMessage() {
+    }
+
+    public WSPMessage(String uuid, String route, String message) {
         this.uuid = uuid;
         this.route = route;
         this.message = message;
@@ -46,11 +49,11 @@ public class WSPMessage<T extends Serializable> implements Serializable{
         this.route = route;
     }
 
-    public T getMessage() {
+    public String getMessage() {
         return message;
     }
 
-    public void setMessage(T message) {
+    public void setMessage(String message) {
         this.message = message;
     }
 

@@ -1,8 +1,7 @@
 package cc.shixw.wsp.wsp.web.server.controller;
 
 import cc.shixw.wsp.wsp.web.server.entity.WSPMessage;
-import cc.shixw.wsp.wsp.web.server.service.WSPPushService;
-import cc.shixw.wsp.wsp.web.server.websocket.WebSocketServer;
+import cc.shixw.wsp.wsp.web.server.service.WebSocketPushService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,11 +20,11 @@ import javax.annotation.Resource;
 public class WebSocketOpenPushController {
 
     @Resource
-    private WSPPushService wspPushService;
+    private WebSocketPushService wspPushService;
 
 
     @RequestMapping(path = "/push/{uuid}/{route}",method = RequestMethod.POST)
     public void push(@PathVariable String uuid,@PathVariable String route, String message){
-        wspPushService.push(new WSPMessage<>(uuid, route, message));
+        wspPushService.push(new WSPMessage(uuid, route, message));
     }
 }
