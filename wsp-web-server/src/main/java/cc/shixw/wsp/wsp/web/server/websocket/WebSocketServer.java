@@ -1,6 +1,7 @@
-package cc.shixw.wsp.wsp.web.server.ws;
+package cc.shixw.wsp.wsp.web.server.websocket;
 
 import cc.shixw.wsp.wsp.web.server.entity.WSPMessage;
+import cc.shixw.wsp.wsp.web.server.service.WebSocketSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -8,7 +9,6 @@ import org.springframework.stereotype.Component;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +31,9 @@ public class WebSocketServer {
     //保存所有的websocket连接
     private static ConcurrentHashMap<String,Set<WebSocketServer>> websocketMap = new ConcurrentHashMap<>();
 
+    public static WebSocketSessionService webSocketSessionService;
+
+
     /**
      * 客户端连接成功
      * @param session
@@ -41,7 +44,7 @@ public class WebSocketServer {
     public void onOpen(Session session, @PathParam("uuid") String uuid,@PathParam("route") String route){
         this.session = session;
         this.key = uuid+route;
-        LOGGER.debug("UUID:"+uuid+",route:"+route+" 连接成功!");
+        //将连接保存到当前服务器缓存中
         if (websocketMap.containsKey(key)){
             websocketMap.get(key).add(this);
         }else{
@@ -49,6 +52,11 @@ public class WebSocketServer {
             set.add(this);
             websocketMap.put(key,set);
         }
+        String host = session.getRequestURI().getHost();
+        int port = session.getRequestURI().getPort();
+        webSocketSessionService.register(key,host,port);
+        LOGGER.debug("UUID:"+uuid+",route:"+route+" 连接成功!");
+
     }
 
     /**
@@ -56,10 +64,15 @@ public class WebSocketServer {
      */
     @OnClose
     public void onClose(){
-        LOGGER.debug("连接关闭");
+        //从当前服务缓存中移除server
         if (websocketMap.containsKey(key)){
             websocketMap.get(key).remove(this);
         }
+        //从session缓存中移除
+        String host = session.getRequestURI().getHost();
+        int port = session.getRequestURI().getPort();
+        webSocketSessionService.unRegister(key,host,port);
+        LOGGER.debug("连接关闭");
     }
 
     /**
@@ -88,6 +101,10 @@ public class WebSocketServer {
     }
 
 
+    /**
+     * 按照route在当前节点的连接缓存中推送消息
+     * @param wspMessage
+     */
     public static void sendInfoByRoute(final WSPMessage wspMessage){
         String key = wspMessage.getUuid()+wspMessage.getRoute();
         if (websocketMap.containsKey(key)){
@@ -103,4 +120,5 @@ public class WebSocketServer {
             LOGGER.error("未找到当前连接的客户端");
         }
     }
+
 }

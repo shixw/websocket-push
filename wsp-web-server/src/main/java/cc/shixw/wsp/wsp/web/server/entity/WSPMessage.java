@@ -24,6 +24,12 @@ public class WSPMessage<T extends Serializable> implements Serializable{
      */
     private T message;
 
+    public WSPMessage(String uuid, String route, T message) {
+        this.uuid = uuid;
+        this.route = route;
+        this.message = message;
+    }
+
     public String getUuid() {
         return uuid;
     }
@@ -46,5 +52,9 @@ public class WSPMessage<T extends Serializable> implements Serializable{
 
     public void setMessage(T message) {
         this.message = message;
+    }
+
+    public String getRouteKey(){
+        return this.uuid+this.route;
     }
 }
