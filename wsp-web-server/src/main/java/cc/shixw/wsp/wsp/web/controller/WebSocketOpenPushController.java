@@ -29,7 +29,7 @@ public class WebSocketOpenPushController {
         wspPushService.push(new WSPMessage(uuid, route,messageId, message));
     }
 
-    @RequestMapping(path = "/pushCycleMessage/{uuid}/{route}",method = RequestMethod.POST)
+        @RequestMapping(path = "/pushCycleMessage/{uuid}/{route}",method = RequestMethod.POST)
     public void pushCycleMessage(@PathVariable String uuid,@PathVariable String route,String messageId, String message,long cyclePeriod){
         wspPushService.pushCycleMessage(new WSPMessage(uuid, route,messageId, message,cyclePeriod, TimeUnit.SECONDS));
     }

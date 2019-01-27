@@ -24,4 +24,8 @@ public class CycleWSPTimerTaskImpl implements TimerTask {
     public void run(Timeout timeout) throws Exception {
         server.executeCycleMessage(wspMessage.getRouteKey(),wspMessage.getMessageId());
     }
+
+    public WSPMessage getWspMessage() {
+        return wspMessage;
+    }
 }

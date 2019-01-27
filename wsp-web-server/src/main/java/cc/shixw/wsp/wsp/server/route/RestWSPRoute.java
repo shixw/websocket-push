@@ -2,11 +2,10 @@ package cc.shixw.wsp.wsp.server.route;
 
 import cc.shixw.wsp.wsp.api.entity.WSPMessage;
 import cc.shixw.wsp.wsp.api.exception.NoRegisterClientException;
-import cc.shixw.wsp.wsp.api.exception.WSPInternalPushException;
 import cc.shixw.wsp.wsp.server.session.WebSocketSessionService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Set;

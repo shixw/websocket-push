@@ -1,6 +1,7 @@
 package cc.shixw.wsp.wsp.server.config;
 
 import cc.shixw.wsp.wsp.server.WebSocketPushServer;
+import cc.shixw.wsp.wsp.server.kafka.KafkaWSPMessageProducer;
 import cc.shixw.wsp.wsp.server.manager.CycleMessageManager;
 import cc.shixw.wsp.wsp.server.manager.impl.CycleMessageManagerImpl;
 import cc.shixw.wsp.wsp.server.route.RestWSPRoute;
@@ -10,6 +11,7 @@ import cc.shixw.wsp.wsp.server.session.RedisWebSocketSessionServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -34,11 +36,18 @@ public class WebSocketPushServerConfig {
     public CycleMessageManager cycleMessageManager(RedisTemplate redisTemplate){
         return new CycleMessageManagerImpl(redisTemplate);
     }
+
     @Bean
-    public WebSocketPushServer webSocketPushServer(WSPRoute wspRoute,CycleMessageManager cycleMessageManager){
+    public KafkaWSPMessageProducer kafkaWSPMessageProducer(KafkaTemplate kafkaTemplate){
+        return new KafkaWSPMessageProducer(kafkaTemplate);
+    }
+
+    @Bean(initMethod = "init",destroyMethod = "stop")
+    public WebSocketPushServer webSocketPushServer(WSPRoute wspRoute,CycleMessageManager cycleMessageManager,KafkaWSPMessageProducer kafkaWSPMessageProducer){
         WebSocketPushServer webSocketPushServer = new WebSocketPushServer();
         webSocketPushServer.setWspRoute(wspRoute);
         webSocketPushServer.setCycleMessageManager(cycleMessageManager);
+        webSocketPushServer.setKafkaWSPMessageProducer(kafkaWSPMessageProducer);
         return webSocketPushServer;
     }
 }
