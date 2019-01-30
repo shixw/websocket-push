@@ -32,6 +32,7 @@ public class RestWSPRoute implements WSPRoute{
      * 将一条消息路由到对应的服务器上
      * @param wspMessage
      */
+    @Override
     public void routeMessage(WSPMessage wspMessage){
         //首先获取当前路由对应的所有的注册的服务地址
         Set<String> registerAddressSet = webSocketSessionService.listRegisterAddress(wspMessage.getRouteKey());
