@@ -46,13 +46,7 @@ public class WebSocketServer {
         this.session = session;
         this.key = uuid+route;
         //将连接保存到当前服务器缓存中
-        if (websocketMap.containsKey(key)){
-            websocketMap.get(key).add(this);
-        }else{
-            Set<WebSocketServer> set = new HashSet<>();
-            set.add(this);
-            websocketMap.put(key,set);
-        }
+        websocketMap.computeIfAbsent(key,k->new HashSet<>()).add(this);
         String host = session.getRequestURI().getHost();
         int port = session.getRequestURI().getPort();
         webSocketSessionService.register(key,host,port);
